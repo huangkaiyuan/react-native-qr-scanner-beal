@@ -115,50 +115,38 @@ export default class Scanner extends Component {
     );
   }
   
-  openPhoto(){
-    console.log('ImagePicker');
-    ImagePicker.launchImageLibrary({}, (response) => {
-      console.log('Response = ', response);
-    
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      }
-      else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      }
-      else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-      }
-      else {
-        if(response.uri){
-          var path = response.path;
-          if(!path){
-              path = response.uri;
-          }
-          QRreader(path).then((data)=>{
-            this.setState({reader: {
-              message: '识别成功',
-              data: data
-            }});
-            // 十秒后自动清空
-            setTimeout(() => {
-              this.setState({reader: {
-                message: null,
-                data: null
-              }})
-            }, 10000);
-          }).catch((err)=>{
-            this.setState({reader: {
-              message: '识别失败',
-              data: null
-            }});
-          });
-          
-      }
-      }
-    });
-  }
-}
+      openPhoto() {
+        ImagePicker.openPicker({
+            width: 200,
+            height: 200,
+            cropping: false,
+            includeBase64: Platform.OS === 'ios' ? false : true
+        }).then(async (image) => {
+            if (Platform.OS === 'ios') {
+                let path =!image.path?image.uri: image.path;
+                QRreader(path).then((res) => {
+                    if (res) {
+                        this.action(res)
+                    }else{
+                        Global.message(i18n.t('global.scanRrror'))
+                    }
+                    // 十秒后自动清空
+                }).catch((err) => {
+                    Global.message(i18n.t('global.scanRrror'))
+                });
+            } else {
+                QRreader(image.data.replace("data:image/jpeg;base64,", ""), { codeTypes: ['ean13', 'qr'] }).then(res => {
+                    if(res){
+                        this.action(res)
+                    }else{
+                        Global.message(i18n.t('global.scanRrror'))
+                    }
+                }).catch((err) => {
+                    Global.message(i18n.t('global.scanRrror'))
+                });
+            }
+        });
+    }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
