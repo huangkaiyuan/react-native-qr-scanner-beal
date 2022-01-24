@@ -1,0 +1,7 @@
+com/lewin/qrcode/BuildConfig.java
+ com.lewin.qrcode.BuildConfig
+com/lewin/qrcode/QRScanReader.java
+ com.lewin.qrcode.QRScanReader
+ com.lewin.qrcode.QRScanReader$1
+com/lewin/qrcode/QRScanReaderPackage.java
+ com.lewin.qrcode.QRScanReaderPackage
